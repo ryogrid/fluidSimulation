@@ -37,6 +37,7 @@
 
 import numpy, time, matplotlib.pyplot, matplotlib.animation
 import mpl_toolkits.mplot3d.axes3d as p3
+from mayavi import mlab
 
 # Define constants:
 height = 80							# lattice dimensions
@@ -231,33 +232,46 @@ def collide():
 # barrierImage = matplotlib.pyplot.imshow(bImageArray, origin='lower', interpolation='none')
 
 # Attaching 3D axis to the figure
-fig = matplotlib.pyplot.figure()
-ax = p3.Axes3D(fig)
+# fig = matplotlib.pyplot.figure()
+# ax = p3.Axes3D(fig)
+#
+# # Setting the axes properties
+# ax.set_xlim3d([0.0, 1.0])
+# ax.set_xlabel('X')
+#
+# ax.set_ylim3d([0.0, 1.0])
+# ax.set_ylabel('Y')
+#
+# ax.set_zlim3d([0.0, 1.0])
+# ax.set_zlabel('Z')
+#
+# ax.set_title('3D Test')
 
-# Setting the axes properties
-ax.set_xlim3d([0.0, 1.0])
-ax.set_xlabel('X')
-
-ax.set_ylim3d([0.0, 1.0])
-ax.set_ylabel('Y')
-
-ax.set_zlim3d([0.0, 1.0])
-ax.set_zlabel('Z')
-
-ax.set_title('3D Test')
+l = mlab.points3d(numpy.random.rand(width), numpy.random.rand(width), numpy.random.rand(width), numpy.random.rand(width), colormap="copper")
+ms = l.mlab_source
+mlab.show()
 
 # Function called for each successive animation frame:
 startTime = time.clock()
 #frameList = open('frameList.txt','w')		# file containing list of images (to make movie)
 
+def min_max(x, axis=0):
+    min = x.min(axis=axis, keepdims=True)
+    max = x.max(axis=axis, keepdims=True)
+    result = (x-min)/(max-min)
+    return result
+
 # Compute curl of the macroscopic velocity field:
 def curl(ux, uy, uz):
-	global ax
+#	global ax
 	tmp = numpy.roll(uy,-1,axis=1) - numpy.roll(uy,1,axis=1) - numpy.roll(ux,-1,axis=0) + numpy.roll(ux,1,axis=0) - numpy.roll(uz,-1,axis=2) - numpy.roll(ux,1,axis=2)
-	return ax.plot(tmp[0,:],tmp[1,:],tmp[2,:])
+	tmp = tmp.T
+	print tmp.shape
+#	return ax.plot(min_max(tmp))
 
-def nextFrame(arg):							# (arg is the frame number, which we don't need)
+def nextFrame():							# (arg is the frame number, which we don't need)
 	global startTime
+	global ms
 	if performanceData and (arg%100 == 0) and (arg > 0):
 		endTime = time.clock()
 		print "%1.1f" % (100/(endTime-startTime)), 'frames per second'
@@ -268,9 +282,14 @@ def nextFrame(arg):							# (arg is the frame number, which we don't need)
 	for step in range(20):					# adjust number of steps for smooth animation
 		stream()
 		collide()
-	return curl(ux, uy, uz)
+	#return curl(ux, uy, uz)
+	ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), s=numpy.random.rand(width))
 	# fluidImage.set_array(curl(ux, uy, uz))
 	# return (fluidImage, barrierImage)		# return the figure elements to redraw
 
-animate = matplotlib.animation.FuncAnimation(fig, nextFrame, interval=1, blit=True)
-matplotlib.pyplot.show()
+while(True){
+	#nextFrame()
+	ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), s=numpy.random.rand(width))
+}
+# animate = matplotlib.animation.FuncAnimation(fig, nextFrame, interval=1, blit=True)
+# matplotlib.pyplot.show()
