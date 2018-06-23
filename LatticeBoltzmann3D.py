@@ -246,10 +246,13 @@ def collide():
 # ax.set_zlabel('Z')
 #
 # ax.set_title('3D Test')
-
-l = mlab.points3d(numpy.random.rand(width), numpy.random.rand(width), numpy.random.rand(width), numpy.random.rand(width), colormap="copper")
+x = numpy.random.rand(width)
+y = numpy.random.rand(width)
+z = numpy.random.rand(width)
+s = numpy.random.rand(width)
+l = mlab.points3d(x, y, z, s, colormap="copper")
 ms = l.mlab_source
-mlab.show()
+#mlab.show()
 
 # Function called for each successive animation frame:
 startTime = time.clock()
@@ -287,9 +290,9 @@ def nextFrame():							# (arg is the frame number, which we don't need)
 	# fluidImage.set_array(curl(ux, uy, uz))
 	# return (fluidImage, barrierImage)		# return the figure elements to redraw
 
-while(True){
+while(True):
 	#nextFrame()
 	ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), s=numpy.random.rand(width))
-}
+
 # animate = matplotlib.animation.FuncAnimation(fig, nextFrame, interval=1, blit=True)
 # matplotlib.pyplot.show()
