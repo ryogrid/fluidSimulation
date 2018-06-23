@@ -1,2 +1,8 @@
 PIC/FLIP Fluid Simulation(WebGLを使ったネイティブコードを叩くpythonライブラリ)
 http://rlguy.com/gridfluidsim/
+3D流体シミュレーション(グラボが必要)
+https://hexadrive.jp/lab/demo/622/
+パラメータ
+https://gyazo.com/0db6ec3f591f730eb20ad379bea3feeb
+Title 格子ボルツマン法 - 京都大学学術情報リポジトリ
+file:///C:/Users/ryo/Downloads/20121228823015-10-0-7.pdf
