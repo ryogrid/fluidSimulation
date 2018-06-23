@@ -246,17 +246,32 @@ def collide():
 # ax.set_zlabel('Z')
 #
 # ax.set_title('3D Test')
-x = numpy.random.rand(width)
-y = numpy.random.rand(width)
-z = numpy.random.rand(width)
-s = numpy.random.rand(width)
-l = mlab.points3d(x, y, z, s, colormap="copper")
+veclen = width * height * depth
+xvec = numpy.zeros(veclen)
+yvec = numpy.zeros(veclen)
+zvec = numpy.zeros(veclen)
+svec = numpy.zeros(veclen)
+
+x = xvec
+y = yvec
+z = zvec
+s = svec
+# u = numpy.full(width,0.01)
+# v = numpy.full(width,0.01)
+# w = numpy.full(width,0.01)
+#l = mlab.points3d(x, y, z, s, colormap="copper")
+l = mlab.points3d(x, y, z, s, scale_factor=0.03, vmin=0.03)
+#l = mlab.quiver3d(x, y, z, u, v, w)
+#l.glyph.glyph.clamping = False
+#l.glyph.color_mode = 'color_by_scalar'
 ms = l.mlab_source
 #mlab.show()
 
 # Function called for each successive animation frame:
 startTime = time.clock()
 #frameList = open('frameList.txt','w')		# file containing list of images (to make movie)
+
+
 
 def min_max(x, axis=0):
     min = x.min(axis=axis, keepdims=True)
@@ -266,11 +281,18 @@ def min_max(x, axis=0):
 
 # Compute curl of the macroscopic velocity field:
 def curl(ux, uy, uz):
-#	global ax
-	tmp = numpy.roll(uy,-1,axis=1) - numpy.roll(uy,1,axis=1) - numpy.roll(ux,-1,axis=0) + numpy.roll(ux,1,axis=0) - numpy.roll(uz,-1,axis=2) - numpy.roll(ux,1,axis=2)
-	tmp = tmp.T
-	print tmp.shape
-#	return ax.plot(min_max(tmp))
+	global xvec, yvec, zvec, svec
+	counter = 0
+	tmp = numpy.roll(uy,-1,axis=1) - numpy.roll(uy,1,axis=1) - numpy.roll(ux,-1,axis=0) + numpy.roll(ux,1,axis=0) + numpy.roll(uz,-1,axis=2) - numpy.roll(uz,1,axis=2)
+	for y in xrange(height):
+		for x in xrange(width):
+			for z in xrange(depth):
+				yvec[counter] = y/100.0
+				xvec[counter] = x/100.0
+				zvec[counter] = z/100.0
+				svec[counter] = tmp[y][x][z]
+				counter += 1
+	return xvec, yvec, zvec, min_max(svec)
 
 def nextFrame():							# (arg is the frame number, which we don't need)
 	global startTime
@@ -286,13 +308,19 @@ def nextFrame():							# (arg is the frame number, which we don't need)
 		stream()
 		collide()
 	#return curl(ux, uy, uz)
-	ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), s=numpy.random.rand(width))
+
+	#ms.scalars = curl(ux, uy, uz)
+	x, y, z, s = curl(ux, uy, uz)
+	ms.trait_set(x=x, y=y, z=z, s=s)
+	#ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), s=numpy.random.rand(width))
+
 	# fluidImage.set_array(curl(ux, uy, uz))
 	# return (fluidImage, barrierImage)		# return the figure elements to redraw
 
 while(True):
-	#nextFrame()
-	ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), s=numpy.random.rand(width))
+	nextFrame()
+	#ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), s=numpy.random.rand(width), scale_factor=1)
+	#ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width))
 
 # animate = matplotlib.animation.FuncAnimation(fig, nextFrame, interval=1, blit=True)
 # matplotlib.pyplot.show()
