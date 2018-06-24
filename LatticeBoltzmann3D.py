@@ -68,15 +68,12 @@ nNEZ1 = one36th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0*
 nSEZ1 = one36th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 nNWZ1 = one36th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 nSWZ1 = one36th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-nNEZ2 = one36th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-nSEZ2 = one36th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-nNWZ2 = one36th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-nSWZ2 = one36th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+
 rho = n0 + nN + nS + nE + nW + nz0 + nz1 +\
-		nNEZ0 + nSEZ0 + nNWZ0 + nSWZ0 + nNEZ1 + nSEZ1 + nNWZ1 + nSWZ1 + nNEZ2 + nSEZ2 + nNWZ2 + nSWZ2		# macroscopic density
-ux = (nE + nNEZ0 + nSEZ0 - nW - nNWZ0 - nSWZ0 + nNEZ1 + nSEZ1 - nNWZ1 - nSWZ1 + nNEZ2 + nSEZ2 - nNWZ2 - nSWZ2) / rho				# macroscopic x velocity
-uy = (nN + nNEZ0 + nNWZ0 - nS - nSEZ0 - nSWZ0 + nNEZ1 + nNWZ1 - nSEZ1 - nSWZ1 + nNEZ2 + nNWZ2 - nSEZ2 - nSWZ2) / rho				# macroscopic y velocity
-uz = (nz0 + nNEZ0 + nNWZ0 - nz1 + nSEZ0 + nSWZ0 - nNEZ1 - nNWZ1 - nSEZ1 - nSWZ1 + nNEZ2 + nNWZ2 + nSEZ2 + nSWZ2) / rho
+		nNEZ0 + nSEZ0 + nNWZ0 + nSWZ0 + nNEZ1 + nSEZ1 + nNWZ1 + nSWZ1		# macroscopic density
+ux = (nE + nNEZ0 + nSEZ0 - nW - nNWZ0 - nSWZ0 + nNEZ1 + nSEZ1 - nNWZ1 - nSWZ1) / rho				# macroscopic x velocity
+uy = (nN + nNEZ0 + nNWZ0 - nS - nSEZ0 - nSWZ0 + nNEZ1 + nNWZ1 - nSEZ1 - nSWZ1) / rho				# macroscopic y velocity
+uz = (nz0 + nNEZ0 + nNWZ0 - nz1 + nSEZ0 + nSWZ0 - nNEZ1 - nNWZ1 - nSEZ1 - nSWZ1) / rho
 
 # Initialize barriers:
 barrier = numpy.zeros((height,width,depth), bool)					# True wherever there's a barrier
@@ -95,24 +92,20 @@ barrierSW = numpy.roll(barrierS, -1, axis=1)
 
 barrierNEZ0 = numpy.roll(barrierNE,  1, axis=2)
 barrierNEZ1 = numpy.roll(barrierNE,  -1, axis=2)
-barrierNEZ2 = numpy.roll(barrierNE,  1, axis=2)
 
 barrierNWZ0 = numpy.roll(barrierNW, 1, axis=2)
 barrierNWZ1 = numpy.roll(barrierNW, -1, axis=2)
-barrierNWZ2 = numpy.roll(barrierNW, 1, axis=2)
 
 barrierSEZ0 = numpy.roll(barrierSE, 1, axis=2)
 barrierSEZ1 = numpy.roll(barrierSE, -1, axis=2)
-barrierSEZ2 = numpy.roll(barrierSE, 1, axis=2)
 
 barrierSWZ0 = numpy.roll(barrierSW, 1, axis=2)
 barrierSWZ1 = numpy.roll(barrierSW, -1, axis=2)
-barrierSWZ2 = numpy.roll(barrierSW, 1, axis=2)
 
 
 # Move all particles by one step along their directions of motion (pbc):
 def stream():
-	global n0, nN, nS, nE, nW, nz0, nz1, nNEZ0, nSEZ0, nNWZ0, nSWZ0, nNEZ1, nSEZ1, nNWZ1, nSWZ1, nNEZ2, nSEZ2, nNWZ2, nSWZ2
+	global n0, nN, nS, nE, nW, nz0, nz1, nNEZ0, nSEZ0, nNWZ0, nSWZ0, nNEZ1, nSEZ1, nNWZ1, nSWZ1
 	nN  = numpy.roll(nN,   1, axis=0)	# axis 0 is north-south; + direction is north
 	nS  = numpy.roll(nS,  -1, axis=0)
 	nE  = numpy.roll(nE,   1, axis=1)	# axis 1 is east-west; + direction is east
@@ -124,45 +117,31 @@ def stream():
 	nNWZ0 = numpy.roll(nNWZ0,  1, axis=0)
 	nNEZ1 = numpy.roll(nNEZ1,  1, axis=0)
 	nNWZ1 = numpy.roll(nNWZ1,  1, axis=0)
-	nNEZ2 = numpy.roll(nNEZ2,  1, axis=0)
-	nNWZ2 = numpy.roll(nNWZ2,  1, axis=0)
 
 	nSEZ0 = numpy.roll(nSEZ0, -1, axis=0)
 	nSWZ0 = numpy.roll(nSWZ0, -1, axis=0)
 	nSEZ1 = numpy.roll(nSEZ1, -1, axis=0)
 	nSWZ1 = numpy.roll(nSWZ1, -1, axis=0)
-	nSEZ2 = numpy.roll(nSEZ2, -1, axis=0)
-	nSWZ2 = numpy.roll(nSWZ2, -1, axis=0)
-
 
 	nNEZ0 = numpy.roll(nNEZ0,  1, axis=1)
 	nNWZ0 = numpy.roll(nNWZ0,  1, axis=1)
 	nNEZ1 = numpy.roll(nNEZ1,  1, axis=1)
 	nNWZ1 = numpy.roll(nNWZ1,  1, axis=1)
-	nNEZ2 = numpy.roll(nNEZ2,  1, axis=1)
-	nNWZ2 = numpy.roll(nNWZ2,  1, axis=1)
 
 	nSEZ0 = numpy.roll(nSEZ0, -1, axis=1)
 	nSWZ0 = numpy.roll(nSWZ0, -1, axis=1)
 	nSEZ1 = numpy.roll(nSEZ1, -1, axis=1)
 	nSWZ1 = numpy.roll(nSWZ1, -1, axis=1)
-	nSEZ2 = numpy.roll(nSEZ2, -1, axis=1)
-	nSWZ2 = numpy.roll(nSWZ2, -1, axis=1)
-
 
 	nNEZ0 = numpy.roll(nNEZ0,  1, axis=2)
 	nNWZ0 = numpy.roll(nNWZ0,  1, axis=2)
 	nNEZ1 = numpy.roll(nNEZ1,  1, axis=2)
 	nNWZ1 = numpy.roll(nNWZ1,  1, axis=2)
-	nNEZ2 = numpy.roll(nNEZ2,  1, axis=2)
-	nNWZ2 = numpy.roll(nNWZ2,  1, axis=2)
 
 	nSEZ0 = numpy.roll(nSEZ0, -1, axis=2)
 	nSWZ0 = numpy.roll(nSWZ0, -1, axis=2)
 	nSEZ1 = numpy.roll(nSEZ1, -1, axis=2)
 	nSWZ1 = numpy.roll(nSWZ1, -1, axis=2)
-	nSEZ2 = numpy.roll(nSEZ2, -1, axis=2)
-	nSWZ2 = numpy.roll(nSWZ2, -1, axis=2)
 
 
 	# Use tricky boolean arrays to handle barrier collisions (bounce-back):
@@ -175,28 +154,24 @@ def stream():
 
 	nNEZ0[barrierNEZ0] = nSWZ1[barrier]
 	nNEZ1[barrierNEZ1] = nSWZ0[barrier]
-	nNEZ2[barrierNEZ2] = nSWZ2[barrier]
 
 	nNWZ0[barrierNWZ0] = nSEZ1[barrier]
 	nNWZ1[barrierNWZ1] = nSEZ0[barrier]
-	nNWZ2[barrierNWZ2] = nSEZ2[barrier]
 
 	nSEZ0[barrierSEZ0] = nNWZ1[barrier]
 	nSEZ1[barrierSEZ1] = nNWZ0[barrier]
-	nSEZ2[barrierSEZ2] = nNWZ2[barrier]
 
 	nSWZ0[barrierSWZ0] = nNEZ1[barrier]
 	nSWZ1[barrierSWZ1] = nNEZ0[barrier]
-	nSWZ2[barrierSWZ2] = nNEZ2[barrier]
 
 # Collide particles within each cell to redistribute velocities (could be optimized a little more):
 def collide():
-	global n0, nN, nS, nE, nW, nz0, nz1, nNEZ0, nSEZ0, nNWZ0, nSWZ0, nNEZ1, nSEZ1, nNWZ1, nSWZ1, nNEZ2, nSEZ2, nNWZ2, nSWZ2, rho, ux, uy, uz
+	global n0, nN, nS, nE, nW, nz0, nz1, nNEZ0, nSEZ0, nNWZ0, nSWZ0, nNEZ1, nSEZ1, nNWZ1, nSWZ1, rho, ux, uy, uz
 	rho = n0 + nN + nS + nE + nW + nz0 + nz1 +\
-			nNEZ0 + nSEZ0 + nNWZ0 + nSWZ0 + nNEZ1 + nSEZ1 + nNWZ1 + nSWZ1 + nNEZ2 + nSEZ2 + nNWZ2 + nSWZ2		# macroscopic density
-	ux = (nE + nNEZ0 + nSEZ0 - nW - nNWZ0 - nSWZ0 + nNEZ1 + nSEZ1 - nNWZ1 - nSWZ1 + nNEZ2 + nSEZ2 - nNWZ2 - nSWZ2) / rho				# macroscopic x velocity
-	uy = (nN + nNEZ0 + nNWZ0 - nS - nSEZ0 - nSWZ0 + nNEZ1 + nNWZ1 - nSEZ1 - nSWZ1 + nNEZ2 + nNWZ2 - nSEZ2 - nSWZ2) / rho				# macroscopic y velocity
-	uz = (nz0 + nNEZ0 + nNWZ0 - nz1 + nSEZ0 + nSWZ0 - nNEZ1 - nNWZ1 - nSEZ1 - nSWZ1 + nNEZ2 + nNWZ2 + nSEZ2 + nSWZ2) / rho
+			nNEZ0 + nSEZ0 + nNWZ0 + nSWZ0 + nNEZ1 + nSEZ1 + nNWZ1 + nSWZ1		# macroscopic density
+	ux = (nE + nNEZ0 + nSEZ0 - nW - nNWZ0 - nSWZ0 + nNEZ1 + nSEZ1 - nNWZ1 - nSWZ1) / rho				# macroscopic x velocity
+	uy = (nN + nNEZ0 + nNWZ0 - nS - nSEZ0 - nSWZ0 + nNEZ1 + nNWZ1 - nSEZ1 - nSWZ1) / rho				# macroscopic y velocity
+	uz = (nz0 + nNEZ0 + nNWZ0 - nz1 + nSEZ0 + nSWZ0 - nNEZ1 - nNWZ1 - nSEZ1 - nSWZ1) / rho
 	ux2 = ux * ux				# pre-compute terms used repeatedly...
 	uy2 = uy * uy
 	uz2 = uz * uz
@@ -211,34 +186,27 @@ def collide():
 	nz0 = (1-omega)*nE + omega * one9th * rho * (omu215 + 3*ux + 4.5*uz2)
 	nz1 = (1-omega)*nW + omega * one9th * rho * (omu215 - 3*ux + 4.5*uz2)
 
-	nNEZ0 = (1-omega)*nNEZ0 + omega * one36th * rho * (omu215 + 3*(ux+uy-uz) + 4.5*(u3-2*uxuyuz))
-	nNWZ1 = (1-omega)*nNWZ1 + omega * one36th * rho * (omu215 + 3*(-ux+uy+uz) + 4.5*(u3-2*uxuyuz))
-	nSEZ2 = (1-omega)*nSEZ2 + omega * one36th * rho * (omu215 + 3*(ux-uy+uz) + 4.5*(u3-2*uxuyuz))
-	nSWZ0 = (1-omega)*nSWZ0 + omega * one36th * rho * (omu215 + 3*(-ux-uy-uz) + 4.5*(u3+2*uxuyuz))
-	nNEZ1 = (1-omega)*nNEZ1 + omega * one36th * rho * (omu215 + 3*(ux+uy+uz) + 4.5*(u3+2*uxuyuz))
-	nNWZ2 = (1-omega)*nNWZ2 + omega * one36th * rho * (omu215 + 3*(-ux+uy+uz) + 4.5*(u3-2*uxuyuz))
-	nSEZ0 = (1-omega)*nSEZ0 + omega * one36th * rho * (omu215 + 3*(ux-uy-uz) + 4.5*(u3+2*uxuyuz))
-	nSWZ1 = (1-omega)*nSWZ1 + omega * one36th * rho * (omu215 + 3*(-ux-uy+uz) + 4.5*(u3+2*uxuyuz))
-	nNEZ2 = (1-omega)*nNEZ2 + omega * one36th * rho * (omu215 + 3*(ux+uy+uz) + 4.5*(u3+2*uxuyuz))
-	nNWZ0 = (1-omega)*nNWZ0 + omega * one36th * rho * (omu215 + 3*(-ux+uy-uz) + 4.5*(u3+2*uxuyuz))
-	nSEZ1 = (1-omega)*nSEZ1 + omega * one36th * rho * (omu215 + 3*(ux-uy+uz) + 4.5*(u3-2*uxuyuz))
-	nSWZ2 = (1-omega)*nSWZ2 + omega * one36th * rho * (omu215 + 3*(-ux-uy+uz) + 4.5*(u3+2*uxuyuz))
+	nNEZ0 = (1-omega)*nNEZ0 + omega * one36th * rho * (omu215 + 3*(ux+uy+uz) + 4.5*(u3-2*uxuyuz))
+	nNWZ1 = (1-omega)*nNWZ1 + omega * one36th * rho * (omu215 + 3*(-ux+uy-uz) + 4.5*(u3-2*uxuyuz))
+	nSWZ0 = (1-omega)*nSWZ0 + omega * one36th * rho * (omu215 + 3*(-ux-uy+uz) + 4.5*(u3+2*uxuyuz))
+	nNEZ1 = (1-omega)*nNEZ1 + omega * one36th * rho * (omu215 + 3*(ux+uy-uz) + 4.5*(u3+2*uxuyuz))
+	nSEZ0 = (1-omega)*nSEZ0 + omega * one36th * rho * (omu215 + 3*(ux-uy+uz) + 4.5*(u3+2*uxuyuz))
+	nSWZ1 = (1-omega)*nSWZ1 + omega * one36th * rho * (omu215 + 3*(-ux-uy-uz) + 4.5*(u3+2*uxuyuz))
+	nNWZ0 = (1-omega)*nNWZ0 + omega * one36th * rho * (omu215 + 3*(-ux+uy+uz) + 4.5*(u3+2*uxuyuz))
+	nSEZ1 = (1-omega)*nSEZ1 + omega * one36th * rho * (omu215 + 3*(ux-uy-uz) + 4.5*(u3-2*uxuyuz))
+
 
 	# Force steady rightward flow at ends (no need to set 0, N, and S components):
 	nE[:,0] = one9th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 	nW[:,0] = one9th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 	nNEZ0[:,0] = one36th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 	nSEZ1[:,0] = one36th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-	nNEZ2[:,0] = one36th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 	nSEZ0[:,0] = one36th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 	nNEZ1[:,0] = one36th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-	nSEZ2[:,0] = one36th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 	nNWZ0[:,0] = one36th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 	nSWZ1[:,0] = one36th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-	nNWZ2[:,0] = one36th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 	nSWZ0[:,0] = one36th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 	nNWZ1[:,0] = one36th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-	nSWZ2[:,0] = one36th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 
 # # Here comes the graphics and animation...
 # theFig = matplotlib.pyplot.figure(figsize=(8,3))
