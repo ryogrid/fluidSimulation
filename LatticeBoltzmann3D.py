@@ -270,14 +270,14 @@ yvec = numpy.random.rand(veclen)
 zvec = numpy.random.rand(veclen)
 svec = numpy.random.rand(veclen)
 
-# x = xvec
-# y = yvec
-# z = zvec
-# s = svec
-x = xvec[0:width]
-y = yvec[0:width]
-z = zvec[0:width]
-s = svec[0:width]
+x = xvec
+y = yvec
+z = zvec
+s = svec
+# x = xvec[0:width]
+# y = yvec[0:width]
+# z = zvec[0:width]
+# s = svec[0:width]
 
 # u = numpy.full(width,0.01)
 # v = numpy.full(width,0.01)
@@ -343,8 +343,8 @@ def nextFrame():							# (arg is the frame number, which we don't need)
 	# 	print(sval)
 	# for idx in xrange(height*width):
 	# 	print(s[idx])
-	#ms.trait_set(x=x, y=y, z=z, s=s)
-	ms.trait_set(x=x[0:width], y=y[0:width], z=z[0:width], scalars=s[0:width])
+	ms.trait_set(x=x, y=y, z=z, scalars=s)
+	#ms.trait_set(x=x[0:width], y=y[0:width], z=z[0:width], scalars=s[0:width])
 	#ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), s=numpy.random.rand(width))
 
 	# fluidImage.set_array(curl(ux, uy, uz))
