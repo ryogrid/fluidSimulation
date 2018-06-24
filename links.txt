@@ -8,3 +8,5 @@ Title 格子ボルツマン法 - 京都大学学術情報リポジトリ
 file:///C:/Users/ryo/Downloads/20121228823015-10-0-7.pdf
 3Dで計算してるっぽいNNのコード
 https://github.com/loliverhennigh/Lattice-Boltzmann-fluid-flow-in-Tensorflow/blob/master/LatFlow/Domain.py
+格子ボルツマン法をGPUで。C++。
+https://github.com/chandlerz/LBM_OpenACC/blob/master/3D_LBM_Poiseuille.cpp

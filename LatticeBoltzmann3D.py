@@ -180,23 +180,28 @@ def collide():
 	u3 = ux2 + uy2 + uz2
 	omu215 = 1 - 1.5*u3			# "one minus u2 times 1.5"
 	uxuyuz = ux * uy * uz
-	n0 = (1-omega)*n0 + omega * two9ths * rho * omu215
-	nN = (1-omega)*nN + omega * one9th * rho * (omu215 + 3*uy + 4.5*uy2)
-	nS = (1-omega)*nS + omega * one9th * rho * (omu215 - 3*uy + 4.5*uy2)
-	nE = (1-omega)*nE + omega * one9th * rho * (omu215 + 3*ux + 4.5*ux2)
-	nW = (1-omega)*nW + omega * one9th * rho * (omu215 - 3*ux + 4.5*ux2)
-	nz0 = (1-omega)*nz0 + omega * one9th * rho * (omu215 + 3*ux + 4.5*uz2)
-	nz1 = (1-omega)*nz1 + omega * one9th * rho * (omu215 - 3*ux + 4.5*uz2)
+	square = 1.5*(ux2 + uy2 + uz2)
 
-	//ここの4.5なんちゃらの中の符号とか係数とかがよくわからない
-	nNEZ0 = (1-omega)*nNEZ0 + omega * one72th * rho * (omu215 + 3*(ux+uy+uz) + 4.5*(u3-2*uxuyuz))
-	nNWZ1 = (1-omega)*nNWZ1 + omega * one72th * rho * (omu215 + 3*(-ux+uy-uz) + 4.5*(u3-2*uxuyuz))
-	nSWZ0 = (1-omega)*nSWZ0 + omega * one72th * rho * (omu215 + 3*(-ux-uy+uz) + 4.5*(u3+2*uxuyuz))
-	nNEZ1 = (1-omega)*nNEZ1 + omega * one72th * rho * (omu215 + 3*(ux+uy-uz) + 4.5*(u3+2*uxuyuz))
-	nSEZ0 = (1-omega)*nSEZ0 + omega * one72th * rho * (omu215 + 3*(ux-uy+uz) + 4.5*(u3+2*uxuyuz))
-	nSWZ1 = (1-omega)*nSWZ1 + omega * one72th * rho * (omu215 + 3*(-ux-uy-uz) + 4.5*(u3+2*uxuyuz))
-	nNWZ0 = (1-omega)*nNWZ0 + omega * one72th * rho * (omu215 + 3*(-ux+uy+uz) + 4.5*(u3+2*uxuyuz))
-	nSEZ1 = (1-omega)*nSEZ1 + omega * one72th * rho * (omu215 + 3*(ux-uy-uz) + 4.5*(u3-2*uxuyuz))
+	n0 = two9ths * rho * omu215
+	nN = one9th * rho * (omu215 + 3*uy + 4.5*uy2)
+	nS = nN - 6.0 * one9th * rho * uy
+	nE = one9th * rho * (omu215 + 3*ux + 4.5*ux2)
+	nW = nE - 6.0 * one9th * rho * ux
+	nz0 = one9th * rho * (omu215 + 3*ux + 4.5*uz2)
+	nz1 = nz0 - 6.0 * one9th * rho * uz
+
+	product = ux+uy+uz
+	nNEZ0 = one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
+	nNWZ1 = nNEZ0 - 6.0 * one72th * rho * product
+	product = ux+uy-uz
+	nSWZ0 = one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
+	nNEZ1 = nSWZ0 - 6.0 * one72th * rho * product
+	product = ux-uy-uz
+	nSEZ0 = one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
+	nSWZ1 = nSEZ0 - 6.0 * one72th * rho * product
+	product = ux-uy-uz
+	nNWZ0 = one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
+	nSEZ1 = nNWZ0 - 6.0 * one72th * rho * product
 
 
 	# Force steady rightward flow at ends (no need to set 0, N, and S components):
