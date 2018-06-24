@@ -176,9 +176,12 @@ def collide():
 	# uz = (nz0 + nNEZ0 + nNWZ0 - nz1 + nSEZ0 + nSWZ0 - nNEZ1 - nNWZ1 - nSEZ1 - nSWZ1) / rho
 	rho = n0 + nN + nS + nE + nW + nz0 + nz1 +\
 			nNEZ0 + nSEZ0 + nNWZ0 + nSWZ0 + nNEZ1 + nSEZ1 + nNWZ1 + nSWZ1		# macroscopic density
-	ux = (n0 - nN + nz1 - nNEZ0 + nNWZ1 - nSWZ0 + nNEZ1 - nSEZ0 + nSWZ1 - nNWZ0) / rho				# macroscopic x velocity
-	uy = (nS - nE + nz1 - nNEZ0 + nNWZ1 - nSWZ0 + nSEZ0 - nNEZ1 + nNWZ0 - nSWZ1) / rho				# macroscopic y velocity
-	uz = (nW - nz0 + nz1 - nNEZ0 + nSWZ0 - nNWZ1 + nNEZ1 - nSEZ0 + nNWZ0 - nSWZ1) / rho
+	ux = (n0 - nN + nz1 - nNEZ0 + nNWZ1 - nSWZ0 + nNEZ1 - nSEZ0 + nSWZ1 - nNWZ0) / (1.0 * rho)				# macroscopic x velocity
+	uy = (nS - nE + nz1 - nNEZ0 + nNWZ1 - nSWZ0 + nSEZ0 - nNEZ1 + nNWZ0 - nSWZ1) / (1.0 * rho)			# macroscopic y velocity
+	uz = (nW - nz0 + nz1 - nNEZ0 + nSWZ0 - nNWZ1 + nNEZ1 - nSEZ0 + nNWZ0 - nSWZ1) / (1.0 * rho)
+	# ux=(n0-nN+nz1-nNEZ0+nNWZ1-nSWZ0+nNEZ1-nSEZ0+nSWZ1-nNWZ0)/rho
+	# uy=(nS-nE+nz1-nNEZ0+nNWZ1-nSWZ0+nSEZ0-nNEZ1+nNWZ0-nSWZ1)/rho
+	# uz=(nW-nz0+nz1-nNEZ0+nSWZ0-nNWZ1+nNEZ1-nSEZ0+nNWZ0-nSWZ1)/rho
 	ux2 = ux * ux				# pre-compute terms used repeatedly...
 	uy2 = uy * uy
 	uz2 = uz * uz
@@ -186,13 +189,14 @@ def collide():
 	omu215 = 1 - 1.5*u3			# "one minus u2 times 1.5"
 	uxuyuz = ux * uy * uz
 	square = 1.5*(ux2 + uy2 + uz2)
+	#print(square.max())
 
 	eq1 = two9ths * rho * omu215
 	eq2 = one9th * rho * (omu215 + 3*uy + 4.5*uy2)
 	eq3 = nN - 6.0 * one9th * rho * uy
 	eq4 = one9th * rho * (omu215 + 3*ux + 4.5*ux2)
 	eq5 = nE - 6.0 * one9th * rho * ux
-	eq6 = one9th * rho * (omu215 + 3*ux + 4.5*uz2)
+	eq6 = one9th * rho * (omu215 + 3*uz + 4.5*uz2)
 	eq7 = nz0 - 6.0 * one9th * rho * uz
 
 	product = ux+uy+uz
@@ -224,6 +228,22 @@ def collide():
 	nNWZ0 += eq14 - nNWZ0
 	nSEZ1 += eq15 - nSEZ1
 
+	# normalize
+	n0 = min_max(n0)
+	nN = min_max(nN)
+	nS = min_max(nS)
+	nE = min_max(nE)
+	nW = min_max(nW)
+	nz0 = min_max(nz0)
+	nz1 = min_max(nz1)
+	nNEZ0 = min_max(nNEZ0)
+	nNWZ1 = min_max(nNWZ1)
+	nSWZ0 = min_max(nSWZ0)
+	nNEZ1 = min_max(nNEZ1)
+	nSEZ0 = min_max(nSEZ0)
+	nSWZ1 = min_max(nSWZ1)
+	nNWZ0 = min_max(nNWZ0)
+	nSEZ1 = min_max(nSEZ1)
 
 	# Force steady rightward flow at ends (no need to set 0, N, and S components):
 	nE[:,0] = one9th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
@@ -295,8 +315,8 @@ startTime = time.clock()
 
 
 def min_max(x, axis=0):
-    min = x.min(axis=axis, keepdims=True)
-    max = x.max(axis=axis, keepdims=True)
+    min = x.min(keepdims=True)
+    max = x.max(keepdims=True)
     result = (x-min)/(max-min)
     return result
 

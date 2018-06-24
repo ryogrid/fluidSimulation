@@ -149,6 +149,23 @@ def collide():
 	nNW[:,0] = one36th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 	nSW[:,0] = one36th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 
+	# これ入れると動くけどおかしくなる
+	# n0 = min_max(n0)
+	# nN = min_max(nN)
+	# nS = min_max(nS)
+	# nE = min_max(nE)
+	# nW = min_max(nW)
+	# nNE = min_max(nNE)
+	# nNW = min_max(nNW)
+	# nSE = min_max(nSE)
+	# nSW = min_max(nSW)
+
+def min_max(x, axis=0):
+    min = x.min(keepdims=True)
+    max = x.max(keepdims=True)
+    result = (x-min)/(max-min)
+    return result
+
 # Compute curl of the macroscopic velocity field:
 def curl(ux, uy):
 	return numpy.roll(uy,-1,axis=1) - numpy.roll(uy,1,axis=1) - numpy.roll(ux,-1,axis=0) + numpy.roll(ux,1,axis=0)
