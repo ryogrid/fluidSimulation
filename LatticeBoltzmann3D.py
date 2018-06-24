@@ -208,21 +208,21 @@ def collide():
 	eq14 = one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
 	eq15 = eq14 - 6.0 * one72th * rho * product
 
-	n0 = eq1 - n0
-	nN = eq2 - nN
-	nS = eq3 - nS
-	nE = eq4 - nE
-	nW = eq5 - nW
-	nz0 = eq6 - nz0
-	nz1 = eq7 - nz1
-	nNEZ0 = eq8 - nNEZ0
-	nNWZ1 = eq9 - nNWZ1
-	nSWZ0 = eq10 - nSWZ0
-	nNEZ1 = eq11 - nNEZ1
-	nSEZ0 = eq12 - nSEZ0
-	nSWZ1 = eq13 - nSWZ1
-	nNWZ0 = eq14 - nNWZ0
-	nSEZ1 = eq15 - nSEZ1
+	n0 += eq1 - n0
+	nN += eq2 - nN
+	nS += eq3 - nS
+	nE += eq4 - nE
+	nW += eq5 - nW
+	nz0 += eq6 - nz0
+	nz1 += eq7 - nz1
+	nNEZ0 += eq8 - nNEZ0
+	nNWZ1 += eq9 - nNWZ1
+	nSWZ0 += eq10 - nSWZ0
+	nNEZ1 += eq11 - nNEZ1
+	nSEZ0 += eq12 - nSEZ0
+	nSWZ1 += eq13 - nSWZ1
+	nNWZ0 += eq14 - nNWZ0
+	nSEZ1 += eq15 - nSEZ1
 
 
 	# Force steady rightward flow at ends (no need to set 0, N, and S components):
@@ -349,7 +349,6 @@ def nextFrame():							# (arg is the frame number, which we don't need)
 
 while(True):
 	nextFrame()
-	sleep(1)
 	#randvec = numpy.random.rand(width)
 	#ms.trait_set(x=randvec, y=randvec, z=randvec, scalars=randvec)
 	#ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), scalars=numpy.random.rand(width))
