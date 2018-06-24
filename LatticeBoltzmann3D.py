@@ -47,27 +47,29 @@ depth = 10
 viscosity = 0.02					# fluid viscosity
 omega = 1 / (3*viscosity + 0.5)		# "relaxation" parameter
 u0 = 0.1							# initial and in-flow speed
+two9ths = 2.0/9.0
 four9ths = 4.0/9.0					# abbreviations for lattice-Boltzmann weight factors
-one9th   = 1.0/9.0
+one9th  = 1.0/9.0
+one72th = 1.0/72.0
 one36th  = 1.0/36.0
 performanceData = False				# set to True if performance data is desired
 
 # Initialize all the arrays to steady rightward flow:
-n0 = four9ths * (numpy.ones((height,width,depth)) - 1.5*u0**2)	# particle densities along 9 directions
+n0 = two9ths * (numpy.ones((height,width,depth)) - 1.5*u0**2)	# particle densities along 9 directions
 nN = one9th * (numpy.ones((height,width,depth)) - 1.5*u0**2)
 nS = one9th * (numpy.ones((height,width,depth)) - 1.5*u0**2)
 nE = one9th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 nW = one9th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 nz0 = one9th * (numpy.ones((height,width,depth)) - 1.5*u0**2)
 nz1 = one9th * (numpy.ones((height,width,depth)) - 1.5*u0**2)
-nNEZ0 = one36th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-nSEZ0 = one36th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-nNWZ0 = one36th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-nSWZ0 = one36th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-nNEZ1 = one36th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-nSEZ1 = one36th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-nNWZ1 = one36th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-nSWZ1 = one36th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+nNEZ0 = one72th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+nSEZ0 = one72th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+nNWZ0 = one72th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+nSWZ0 = one72th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+nNEZ1 = one72th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+nSEZ1 = one72th * (numpy.ones((height,width,depth)) + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+nNWZ1 = one72th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+nSWZ1 = one72th * (numpy.ones((height,width,depth)) - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 
 rho = n0 + nN + nS + nE + nW + nz0 + nz1 +\
 		nNEZ0 + nSEZ0 + nNWZ0 + nSWZ0 + nNEZ1 + nSEZ1 + nNWZ1 + nSWZ1		# macroscopic density
@@ -178,35 +180,36 @@ def collide():
 	u3 = ux2 + uy2 + uz2
 	omu215 = 1 - 1.5*u3			# "one minus u2 times 1.5"
 	uxuyuz = ux * uy * uz
-	n0 = (1-omega)*n0 + omega * four9ths * rho * omu215
+	n0 = (1-omega)*n0 + omega * two9ths * rho * omu215
 	nN = (1-omega)*nN + omega * one9th * rho * (omu215 + 3*uy + 4.5*uy2)
 	nS = (1-omega)*nS + omega * one9th * rho * (omu215 - 3*uy + 4.5*uy2)
 	nE = (1-omega)*nE + omega * one9th * rho * (omu215 + 3*ux + 4.5*ux2)
 	nW = (1-omega)*nW + omega * one9th * rho * (omu215 - 3*ux + 4.5*ux2)
-	nz0 = (1-omega)*nE + omega * one9th * rho * (omu215 + 3*ux + 4.5*uz2)
-	nz1 = (1-omega)*nW + omega * one9th * rho * (omu215 - 3*ux + 4.5*uz2)
+	nz0 = (1-omega)*nz0 + omega * one9th * rho * (omu215 + 3*ux + 4.5*uz2)
+	nz1 = (1-omega)*nz1 + omega * one9th * rho * (omu215 - 3*ux + 4.5*uz2)
 
-	nNEZ0 = (1-omega)*nNEZ0 + omega * one36th * rho * (omu215 + 3*(ux+uy+uz) + 4.5*(u3-2*uxuyuz))
-	nNWZ1 = (1-omega)*nNWZ1 + omega * one36th * rho * (omu215 + 3*(-ux+uy-uz) + 4.5*(u3-2*uxuyuz))
-	nSWZ0 = (1-omega)*nSWZ0 + omega * one36th * rho * (omu215 + 3*(-ux-uy+uz) + 4.5*(u3+2*uxuyuz))
-	nNEZ1 = (1-omega)*nNEZ1 + omega * one36th * rho * (omu215 + 3*(ux+uy-uz) + 4.5*(u3+2*uxuyuz))
-	nSEZ0 = (1-omega)*nSEZ0 + omega * one36th * rho * (omu215 + 3*(ux-uy+uz) + 4.5*(u3+2*uxuyuz))
-	nSWZ1 = (1-omega)*nSWZ1 + omega * one36th * rho * (omu215 + 3*(-ux-uy-uz) + 4.5*(u3+2*uxuyuz))
-	nNWZ0 = (1-omega)*nNWZ0 + omega * one36th * rho * (omu215 + 3*(-ux+uy+uz) + 4.5*(u3+2*uxuyuz))
-	nSEZ1 = (1-omega)*nSEZ1 + omega * one36th * rho * (omu215 + 3*(ux-uy-uz) + 4.5*(u3-2*uxuyuz))
+	//ここの4.5なんちゃらの中の符号とか係数とかがよくわからない
+	nNEZ0 = (1-omega)*nNEZ0 + omega * one72th * rho * (omu215 + 3*(ux+uy+uz) + 4.5*(u3-2*uxuyuz))
+	nNWZ1 = (1-omega)*nNWZ1 + omega * one72th * rho * (omu215 + 3*(-ux+uy-uz) + 4.5*(u3-2*uxuyuz))
+	nSWZ0 = (1-omega)*nSWZ0 + omega * one72th * rho * (omu215 + 3*(-ux-uy+uz) + 4.5*(u3+2*uxuyuz))
+	nNEZ1 = (1-omega)*nNEZ1 + omega * one72th * rho * (omu215 + 3*(ux+uy-uz) + 4.5*(u3+2*uxuyuz))
+	nSEZ0 = (1-omega)*nSEZ0 + omega * one72th * rho * (omu215 + 3*(ux-uy+uz) + 4.5*(u3+2*uxuyuz))
+	nSWZ1 = (1-omega)*nSWZ1 + omega * one72th * rho * (omu215 + 3*(-ux-uy-uz) + 4.5*(u3+2*uxuyuz))
+	nNWZ0 = (1-omega)*nNWZ0 + omega * one72th * rho * (omu215 + 3*(-ux+uy+uz) + 4.5*(u3+2*uxuyuz))
+	nSEZ1 = (1-omega)*nSEZ1 + omega * one72th * rho * (omu215 + 3*(ux-uy-uz) + 4.5*(u3-2*uxuyuz))
 
 
 	# Force steady rightward flow at ends (no need to set 0, N, and S components):
 	nE[:,0] = one9th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 	nW[:,0] = one9th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-	nNEZ0[:,0] = one36th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-	nSEZ1[:,0] = one36th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-	nSEZ0[:,0] = one36th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-	nNEZ1[:,0] = one36th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-	nNWZ0[:,0] = one36th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-	nSWZ1[:,0] = one36th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-	nSWZ0[:,0] = one36th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
-	nNWZ1[:,0] = one36th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+	nNEZ0[:,0] = one72th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+	nSEZ1[:,0] = one72th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+	nSEZ0[:,0] = one72th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+	nNEZ1[:,0] = one72th * (1 + 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+	nNWZ0[:,0] = one72th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+	nSWZ1[:,0] = one72th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+	nSWZ0[:,0] = one72th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
+	nNWZ1[:,0] = one72th * (1 - 3*u0 + 4.5*u0**2 - 1.5*u0**2)
 
 # # Here comes the graphics and animation...
 # theFig = matplotlib.pyplot.figure(figsize=(8,3))
