@@ -41,7 +41,7 @@ from mayavi import mlab
 
 # Define constants:
 height = 80							# lattice dimensions
-width = 200
+width = 80 #200
 depth = 10
 viscosity = 0.02					# fluid viscosity
 omega = 1 / (3*viscosity + 0.5)		# "relaxation" parameter
@@ -93,20 +93,20 @@ barrierSE = numpy.roll(barrierS,  1, axis=1)
 barrierSW = numpy.roll(barrierS, -1, axis=1)
 
 barrierNEZ0 = numpy.roll(barrierNE,  1, axis=2)
-barrierNEZ1 = numpy.roll(barrierNE,  1, axis=2)
+barrierNEZ1 = numpy.roll(barrierNE,  -1, axis=2)
 barrierNEZ2 = numpy.roll(barrierNE,  1, axis=2)
 
-barrierNWZ0 = numpy.roll(barrierNW, -1, axis=2)
+barrierNWZ0 = numpy.roll(barrierNW, 1, axis=2)
 barrierNWZ1 = numpy.roll(barrierNW, -1, axis=2)
-barrierNWZ2 = numpy.roll(barrierNW, -1, axis=2)
+barrierNWZ2 = numpy.roll(barrierNW, 1, axis=2)
 
-barrierSEZ0 = numpy.roll(barrierSE,  1, axis=2)
-barrierSEZ1 = numpy.roll(barrierSE,  1, axis=2)
-barrierSEZ2 = numpy.roll(barrierSE,  1, axis=2)
+barrierSEZ0 = numpy.roll(barrierSE, 1, axis=2)
+barrierSEZ1 = numpy.roll(barrierSE, -1, axis=2)
+barrierSEZ2 = numpy.roll(barrierSE, 1, axis=2)
 
-barrierSWZ2 = numpy.roll(barrierSW, -1, axis=2)
-barrierSWZ2 = numpy.roll(barrierSW, -1, axis=2)
-barrierSWZ2 = numpy.roll(barrierSW, -1, axis=2)
+barrierSWZ0 = numpy.roll(barrierSW, 1, axis=2)
+barrierSWZ1 = numpy.roll(barrierSW, -1, axis=2)
+barrierSWZ2 = numpy.roll(barrierSW, 1, axis=2)
 
 
 # Move all particles by one step along their directions of motion (pbc):
@@ -144,6 +144,35 @@ def stream():
 	nNWZ2 = numpy.roll(nNWZ2, -1, axis=1)
 	nSWZ2 = numpy.roll(nSWZ2, -1, axis=1)
 
+
+	nNEZ0 = numpy.roll(nNEZ0,  1, axis=2)
+	nNWZ0 = numpy.roll(nNWZ0,  1, axis=2)
+	nNEZ1 = numpy.roll(nNEZ1,  1, axis=2)
+	nNWZ1 = numpy.roll(nNWZ1,  1, axis=2)
+	nNEZ2 = numpy.roll(nNEZ2,  1, axis=2)
+	nNWZ2 = numpy.roll(nNWZ2,  1, axis=2)
+
+	nSEZ0 = numpy.roll(nSEZ0, -1, axis=2)
+	nSWZ0 = numpy.roll(nSWZ0, -1, axis=2)
+	nSEZ1 = numpy.roll(nSEZ1, -1, axis=2)
+	nSWZ1 = numpy.roll(nSWZ1, -1, axis=2)
+	nSEZ2 = numpy.roll(nSEZ2, -1, axis=2)
+	nSWZ2 = numpy.roll(nSWZ2, -1, axis=2)
+
+	nNEZ0 = numpy.roll(nNEZ0,  1, axis=2)
+	nSEZ0 = numpy.roll(nSEZ0,  1, axis=2)
+	nNEZ1 = numpy.roll(nNEZ1,  1, axis=2)
+	nSEZ1 = numpy.roll(nSEZ1,  1, axis=2)
+	nNEZ2 = numpy.roll(nNEZ2,  1, axis=2)
+	nSEZ2 = numpy.roll(nSEZ2,  1, axis=2)
+
+	nNWZ0 = numpy.roll(nNWZ0, -1, axis=2)
+	nSWZ0 = numpy.roll(nSWZ0, -1, axis=2)
+	nNWZ1 = numpy.roll(nNWZ1, -1, axis=2)
+	nSWZ1 = numpy.roll(nSWZ1, -1, axis=2)
+	nNWZ2 = numpy.roll(nNWZ2, -1, axis=2)
+	nSWZ2 = numpy.roll(nSWZ2, -1, axis=2)
+
 	nz0  = numpy.roll(nz0,  1, axis=2)
 	nz1  = numpy.roll(nz1,  -1, axis=2)
 
@@ -167,9 +196,9 @@ def stream():
 	nSEZ1[barrierSEZ1] = nNWZ0[barrier]
 	nSEZ2[barrierSEZ2] = nNWZ1[barrier]
 
-	nSWZ0[barrierSW] = nNEZ2[barrier]
-	nSWZ1[barrierSW] = nNEZ0[barrier]
-	nSWZ2[barrierSW] = nNEZ1[barrier]
+	nSWZ0[barrierSWZ0] = nNEZ2[barrier]
+	nSWZ1[barrierSWZ1] = nNEZ0[barrier]
+	nSWZ2[barrierSWZ2] = nNEZ1[barrier]
 
 # Collide particles within each cell to redistribute velocities (could be optimized a little more):
 def collide():
