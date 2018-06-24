@@ -113,6 +113,12 @@ barrierSWZ2 = numpy.roll(barrierSW, 1, axis=2)
 def stream():
 	global n0, nN, nS, nE, nW, nz0, nz1, nNEZ0, nSEZ0, nNWZ0, nSWZ0, nNEZ1, nSEZ1, nNWZ1, nSWZ1, nNEZ2, nSEZ2, nNWZ2, nSWZ2
 	nN  = numpy.roll(nN,   1, axis=0)	# axis 0 is north-south; + direction is north
+	nS  = numpy.roll(nS,  -1, axis=0)
+	nE  = numpy.roll(nE,   1, axis=1)	# axis 1 is east-west; + direction is east
+	nW  = numpy.roll(nW,  -1, axis=1)
+	nz0  = numpy.roll(nz0,  1, axis=2)
+	nz1  = numpy.roll(nz1,  -1, axis=2)
+
 	nNEZ0 = numpy.roll(nNEZ0,  1, axis=0)
 	nNWZ0 = numpy.roll(nNWZ0,  1, axis=0)
 	nNEZ1 = numpy.roll(nNEZ1,  1, axis=0)
@@ -120,7 +126,6 @@ def stream():
 	nNEZ2 = numpy.roll(nNEZ2,  1, axis=0)
 	nNWZ2 = numpy.roll(nNWZ2,  1, axis=0)
 
-	nS  = numpy.roll(nS,  -1, axis=0)
 	nSEZ0 = numpy.roll(nSEZ0, -1, axis=0)
 	nSWZ0 = numpy.roll(nSWZ0, -1, axis=0)
 	nSEZ1 = numpy.roll(nSEZ1, -1, axis=0)
@@ -128,20 +133,19 @@ def stream():
 	nSEZ2 = numpy.roll(nSEZ2, -1, axis=0)
 	nSWZ2 = numpy.roll(nSWZ2, -1, axis=0)
 
-	nE  = numpy.roll(nE,   1, axis=1)	# axis 1 is east-west; + direction is east
-	nNEZ0 = numpy.roll(nNEZ0,  1, axis=1)
-	nSEZ0 = numpy.roll(nSEZ0,  1, axis=1)
-	nNEZ1 = numpy.roll(nNEZ1,  1, axis=1)
-	nSEZ1 = numpy.roll(nSEZ1,  1, axis=1)
-	nNEZ2 = numpy.roll(nNEZ2,  1, axis=1)
-	nSEZ2 = numpy.roll(nSEZ2,  1, axis=1)
 
-	nW  = numpy.roll(nW,  -1, axis=1)
-	nNWZ0 = numpy.roll(nNWZ0, -1, axis=1)
+	nNEZ0 = numpy.roll(nNEZ0,  1, axis=1)
+	nNWZ0 = numpy.roll(nNWZ0,  1, axis=1)
+	nNEZ1 = numpy.roll(nNEZ1,  1, axis=1)
+	nNWZ1 = numpy.roll(nNWZ1,  1, axis=1)
+	nNEZ2 = numpy.roll(nNEZ2,  1, axis=1)
+	nNWZ2 = numpy.roll(nNWZ2,  1, axis=1)
+
+	nSEZ0 = numpy.roll(nSEZ0, -1, axis=1)
 	nSWZ0 = numpy.roll(nSWZ0, -1, axis=1)
-	nNWZ1 = numpy.roll(nNWZ1, -1, axis=1)
+	nSEZ1 = numpy.roll(nSEZ1, -1, axis=1)
 	nSWZ1 = numpy.roll(nSWZ1, -1, axis=1)
-	nNWZ2 = numpy.roll(nNWZ2, -1, axis=1)
+	nSEZ2 = numpy.roll(nSEZ2, -1, axis=1)
 	nSWZ2 = numpy.roll(nSWZ2, -1, axis=1)
 
 
@@ -159,22 +163,6 @@ def stream():
 	nSEZ2 = numpy.roll(nSEZ2, -1, axis=2)
 	nSWZ2 = numpy.roll(nSWZ2, -1, axis=2)
 
-	nNEZ0 = numpy.roll(nNEZ0,  1, axis=2)
-	nSEZ0 = numpy.roll(nSEZ0,  1, axis=2)
-	nNEZ1 = numpy.roll(nNEZ1,  1, axis=2)
-	nSEZ1 = numpy.roll(nSEZ1,  1, axis=2)
-	nNEZ2 = numpy.roll(nNEZ2,  1, axis=2)
-	nSEZ2 = numpy.roll(nSEZ2,  1, axis=2)
-
-	nNWZ0 = numpy.roll(nNWZ0, -1, axis=2)
-	nSWZ0 = numpy.roll(nSWZ0, -1, axis=2)
-	nNWZ1 = numpy.roll(nNWZ1, -1, axis=2)
-	nSWZ1 = numpy.roll(nSWZ1, -1, axis=2)
-	nNWZ2 = numpy.roll(nNWZ2, -1, axis=2)
-	nSWZ2 = numpy.roll(nSWZ2, -1, axis=2)
-
-	nz0  = numpy.roll(nz0,  1, axis=2)
-	nz1  = numpy.roll(nz1,  -1, axis=2)
 
 	# Use tricky boolean arrays to handle barrier collisions (bounce-back):
 	nN[barrierN] = nS[barrier]
