@@ -284,6 +284,8 @@ def curl(ux, uy, uz):
 	global xvec, yvec, zvec, svec
 	counter = 0
 	tmp = numpy.roll(uy,-1,axis=1) - numpy.roll(uy,1,axis=1) - numpy.roll(ux,-1,axis=0) + numpy.roll(ux,1,axis=0) + numpy.roll(uz,-1,axis=2) - numpy.roll(uz,1,axis=2)
+
+	st = time.clock()
 	for y in xrange(height):
 		for x in xrange(width):
 			for z in xrange(depth):
@@ -292,7 +294,8 @@ def curl(ux, uy, uz):
 				zvec[counter] = z/100.0
 				svec[counter] = tmp[y][x][z]
 				counter += 1
-	return xvec, yvec, zvec, min_max(svec)
+	print("elapse time at3xroop:" + str(time.clock() - st))
+	return xvec, yvec, zvec, svec
 
 def nextFrame():							# (arg is the frame number, which we don't need)
 	global startTime
@@ -311,6 +314,8 @@ def nextFrame():							# (arg is the frame number, which we don't need)
 
 	#ms.scalars = curl(ux, uy, uz)
 	x, y, z, s = curl(ux, uy, uz)
+	# for sval in s:
+	# 	print(sval)
 	ms.trait_set(x=x, y=y, z=z, s=s)
 	#ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), s=numpy.random.rand(width))
 
