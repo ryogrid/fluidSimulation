@@ -42,8 +42,8 @@ from time import sleep
 
 # Define constants:
 height = 80							# lattice dimensions
-width = 80 #200
-depth = 10
+width = 10 #200
+depth = 80
 viscosity = 0.02					# fluid viscosity
 omega = 1 / (3*viscosity + 0.5)		# "relaxation" parameter
 u0 = 0.1							# initial and in-flow speed
@@ -169,11 +169,16 @@ def stream():
 # Collide particles within each cell to redistribute velocities (could be optimized a little more):
 def collide():
 	global n0, nN, nS, nE, nW, nz0, nz1, nNEZ0, nSEZ0, nNWZ0, nSWZ0, nNEZ1, nSEZ1, nNWZ1, nSWZ1, rho, ux, uy, uz
+	# rho = n0 + nN + nS + nE + nW + nz0 + nz1 +\
+	# 		nNEZ0 + nSEZ0 + nNWZ0 + nSWZ0 + nNEZ1 + nSEZ1 + nNWZ1 + nSWZ1		# macroscopic density
+	# ux = (nE + nNEZ0 + nSEZ0 - nW - nNWZ0 - nSWZ0 + nNEZ1 + nSEZ1 - nNWZ1 - nSWZ1) / rho				# macroscopic x velocity
+	# uy = (nN + nNEZ0 + nNWZ0 - nS - nSEZ0 - nSWZ0 + nNEZ1 + nNWZ1 - nSEZ1 - nSWZ1) / rho				# macroscopic y velocity
+	# uz = (nz0 + nNEZ0 + nNWZ0 - nz1 + nSEZ0 + nSWZ0 - nNEZ1 - nNWZ1 - nSEZ1 - nSWZ1) / rho
 	rho = n0 + nN + nS + nE + nW + nz0 + nz1 +\
 			nNEZ0 + nSEZ0 + nNWZ0 + nSWZ0 + nNEZ1 + nSEZ1 + nNWZ1 + nSWZ1		# macroscopic density
-	ux = (nE + nNEZ0 + nSEZ0 - nW - nNWZ0 - nSWZ0 + nNEZ1 + nSEZ1 - nNWZ1 - nSWZ1) / rho				# macroscopic x velocity
-	uy = (nN + nNEZ0 + nNWZ0 - nS - nSEZ0 - nSWZ0 + nNEZ1 + nNWZ1 - nSEZ1 - nSWZ1) / rho				# macroscopic y velocity
-	uz = (nz0 + nNEZ0 + nNWZ0 - nz1 + nSEZ0 + nSWZ0 - nNEZ1 - nNWZ1 - nSEZ1 - nSWZ1) / rho
+	ux = (n0 - nN + nz1 - nNEZ0 + nNWZ1 - nSWZ0 + nNEZ1 - nSEZ0 + nSWZ1 - nNWZ0) / rho				# macroscopic x velocity
+	uy = (nS - nE + nz1 - nNEZ0 + nNWZ1 - nSWZ0 + nSEZ0 - nNEZ1 + nNWZ0 - nSWZ1) / rho				# macroscopic y velocity
+	uz = (nW - nz0 + nz1 - nNEZ0 + nSWZ0 - nNWZ1 + nNEZ1 - nSEZ0 + nNWZ0 - nSWZ1) / rho
 	ux2 = ux * ux				# pre-compute terms used repeatedly...
 	uy2 = uy * uy
 	uz2 = uz * uz
@@ -182,26 +187,42 @@ def collide():
 	uxuyuz = ux * uy * uz
 	square = 1.5*(ux2 + uy2 + uz2)
 
-	n0 = two9ths * rho * omu215
-	nN = one9th * rho * (omu215 + 3*uy + 4.5*uy2)
-	nS = nN - 6.0 * one9th * rho * uy
-	nE = one9th * rho * (omu215 + 3*ux + 4.5*ux2)
-	nW = nE - 6.0 * one9th * rho * ux
-	nz0 = one9th * rho * (omu215 + 3*ux + 4.5*uz2)
-	nz1 = nz0 - 6.0 * one9th * rho * uz
+	eq1 = two9ths * rho * omu215
+	eq2 = one9th * rho * (omu215 + 3*uy + 4.5*uy2)
+	eq3 = nN - 6.0 * one9th * rho * uy
+	eq4 = one9th * rho * (omu215 + 3*ux + 4.5*ux2)
+	eq5 = nE - 6.0 * one9th * rho * ux
+	eq6 = one9th * rho * (omu215 + 3*ux + 4.5*uz2)
+	eq7 = nz0 - 6.0 * one9th * rho * uz
 
 	product = ux+uy+uz
-	nNEZ0 = one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
-	nNWZ1 = nNEZ0 - 6.0 * one72th * rho * product
+	eq8= one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
+	eq9 = eq8 - 6.0 * one72th * rho * product
 	product = ux+uy-uz
-	nSWZ0 = one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
-	nNEZ1 = nSWZ0 - 6.0 * one72th * rho * product
+	eq10 = one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
+	eq11 = eq10 - 6.0 * one72th * rho * product
 	product = ux-uy-uz
-	nSEZ0 = one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
-	nSWZ1 = nSEZ0 - 6.0 * one72th * rho * product
+	eq12 = one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
+	eq13 = eq12 - 6.0 * one72th * rho * product
 	product = ux-uy-uz
-	nNWZ0 = one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
-	nSEZ1 = nNWZ0 - 6.0 * one72th * rho * product
+	eq14 = one72th * rho * (1.0 + 3*product + 4.5*(product**2) - square)
+	eq15 = eq14 - 6.0 * one72th * rho * product
+
+	n0 = eq1 - n0
+	nN = eq2 - nN
+	nS = eq3 - nS
+	nE = eq4 - nE
+	nW = eq5 - nW
+	nz0 = eq6 - nz0
+	nz1 = eq7 - nz1
+	nNEZ0 = eq8 - nNEZ0
+	nNWZ1 = eq9 - nNWZ1
+	nSWZ0 = eq10 - nSWZ0
+	nNEZ1 = eq11 - nNEZ1
+	nSEZ0 = eq12 - nSEZ0
+	nSWZ1 = eq13 - nSWZ1
+	nNWZ0 = eq14 - nNWZ0
+	nSEZ1 = eq15 - nSEZ1
 
 
 	# Force steady rightward flow at ends (no need to set 0, N, and S components):
