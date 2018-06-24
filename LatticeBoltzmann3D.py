@@ -38,6 +38,7 @@
 import numpy, time, matplotlib.pyplot, matplotlib.animation
 import mpl_toolkits.mplot3d.axes3d as p3
 from mayavi import mlab
+from time import sleep
 
 # Define constants:
 height = 80							# lattice dimensions
@@ -172,21 +173,21 @@ def stream():
 	nz0[barrierZ0] = nz1[barrier]
 	nz1[barrierZ1] = nz0[barrier]
 
-	nNEZ0[barrierNEZ0] = nSWZ2[barrier]
+	nNEZ0[barrierNEZ0] = nSWZ1[barrier]
 	nNEZ1[barrierNEZ1] = nSWZ0[barrier]
-	nNEZ2[barrierNEZ2] = nSWZ1[barrier]
+	nNEZ2[barrierNEZ2] = nSWZ2[barrier]
 
-	nNWZ0[barrierNWZ0] = nSEZ2[barrier]
+	nNWZ0[barrierNWZ0] = nSEZ1[barrier]
 	nNWZ1[barrierNWZ1] = nSEZ0[barrier]
-	nNWZ2[barrierNWZ2] = nSEZ1[barrier]
+	nNWZ2[barrierNWZ2] = nSEZ2[barrier]
 
-	nSEZ0[barrierSEZ0] = nNWZ2[barrier]
+	nSEZ0[barrierSEZ0] = nNWZ1[barrier]
 	nSEZ1[barrierSEZ1] = nNWZ0[barrier]
-	nSEZ2[barrierSEZ2] = nNWZ1[barrier]
+	nSEZ2[barrierSEZ2] = nNWZ2[barrier]
 
-	nSWZ0[barrierSWZ0] = nNEZ2[barrier]
+	nSWZ0[barrierSWZ0] = nNEZ1[barrier]
 	nSWZ1[barrierSWZ1] = nNEZ0[barrier]
-	nSWZ2[barrierSWZ2] = nNEZ1[barrier]
+	nSWZ2[barrierSWZ2] = nNEZ2[barrier]
 
 # Collide particles within each cell to redistribute velocities (could be optimized a little more):
 def collide():
@@ -264,20 +265,26 @@ def collide():
 #
 # ax.set_title('3D Test')
 veclen = width * height * depth
-xvec = numpy.zeros(veclen)
-yvec = numpy.zeros(veclen)
-zvec = numpy.zeros(veclen)
-svec = numpy.zeros(veclen)
+xvec = numpy.random.rand(veclen)
+yvec = numpy.random.rand(veclen)
+zvec = numpy.random.rand(veclen)
+svec = numpy.random.rand(veclen)
 
-x = xvec
-y = yvec
-z = zvec
-s = svec
+# x = xvec
+# y = yvec
+# z = zvec
+# s = svec
+x = xvec[0:width]
+y = yvec[0:width]
+z = zvec[0:width]
+s = svec[0:width]
+
 # u = numpy.full(width,0.01)
 # v = numpy.full(width,0.01)
 # w = numpy.full(width,0.01)
 #l = mlab.points3d(x, y, z, s, colormap="copper")
-l = mlab.points3d(x, y, z, s, scale_factor=0.03, vmin=0.03)
+#l = mlab.points3d(x, y, z, s, scale_factor=0.03, vmin=0.03)
+l = mlab.points3d(x, y, z, s, scale_factor=0.03)
 #l = mlab.quiver3d(x, y, z, u, v, w)
 #l.glyph.glyph.clamping = False
 #l.glyph.color_mode = 'color_by_scalar'
@@ -331,9 +338,13 @@ def nextFrame():							# (arg is the frame number, which we don't need)
 
 	#ms.scalars = curl(ux, uy, uz)
 	x, y, z, s = curl(ux, uy, uz)
+	s = min_max(s)
 	# for sval in s:
 	# 	print(sval)
-	ms.trait_set(x=x, y=y, z=z, s=s)
+	# for idx in xrange(height*width):
+	# 	print(s[idx])
+	#ms.trait_set(x=x, y=y, z=z, s=s)
+	ms.trait_set(x=x[0:width], y=y[0:width], z=z[0:width], scalars=s[0:width])
 	#ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), s=numpy.random.rand(width))
 
 	# fluidImage.set_array(curl(ux, uy, uz))
@@ -341,8 +352,10 @@ def nextFrame():							# (arg is the frame number, which we don't need)
 
 while(True):
 	nextFrame()
-	#ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), s=numpy.random.rand(width), scale_factor=1)
-	#ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width))
+	sleep(1)
+	#randvec = numpy.random.rand(width)
+	#ms.trait_set(x=randvec, y=randvec, z=randvec, scalars=randvec)
+	#ms.trait_set(x=numpy.random.rand(width), y=numpy.random.rand(width), z=numpy.random.rand(width), scalars=numpy.random.rand(width))
 
 # animate = matplotlib.animation.FuncAnimation(fig, nextFrame, interval=1, blit=True)
 # matplotlib.pyplot.show()
